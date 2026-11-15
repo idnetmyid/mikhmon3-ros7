@@ -1,0 +1,20 @@
+# Environment and credentials
+.env
+.env.*
+!.env.example
+
+# Private data and backups
+/data/
+/backup/
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/

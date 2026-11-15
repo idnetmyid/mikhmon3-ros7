@@ -1,0 +1,13 @@
+.git
+.gitignore
+.vscode
+
+backup/
+data/
+
+**/debug.log
+*.log
+*.tmp
+
+.env
+.env.*

@@ -1,0 +1,9 @@
+services:
+  mikhmon:
+    image: indrakur/mikhmon3-ros7:latest
+    container_name: mikhmon
+    ports:
+      - 83:80
+    environment:
+      - TZ=Asia/Jakarta
+    restart: unless-stopped
