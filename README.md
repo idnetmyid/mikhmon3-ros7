@@ -1,27 +1,24 @@
 # Mikhmon 3 ROS7 – Docker
 
-**Mikhmon 3 for RouterOS7** is a Docker-ready version of Mikhmon, designed to manage MikroTik Hotspot services through the MikroTik RouterOS API.
+**Mikhmon 3 for RouterOS 7** is a Docker-ready version of Mikhmon, designed to manage MikroTik Hotspot services through the MikroTik RouterOS API.
 
-This project packages and customizes the original Mikhmon application for modern Docker-based deployment environments.
-
-It uses **PHP 8.4 with Apache** and supports both **AMD64** and **ARM64** architectures.
+This image uses PHP 8.4 with Apache and supports both **AMD64** and **ARM64** architectures, making it suitable for desktop servers, VPS, mini PCs, and ARM-based devices.
 
 ## Features
 
-- Docker-based deployment using Apache and PHP 8.4.
+- Docker-based deployment with Apache and PHP 8.4.
 - Designed for MikroTik RouterOS 7.
-- MikroTik Hotspot management.
-- Multi-platform support: `linux/amd64` and `linux/arm64`.
-- Persistent application configuration.
+- Supports MikroTik Hotspot management and PPPoE Client.
+- Multi-platform image: `linux/amd64` and `linux/arm64`.
+- Persistent configuration and application data.
 - Automatic initial configuration file creation.
 - Docker Compose support.
 - Application source files can be managed through a host directory.
-- Suitable for VPS, mini PCs, home servers, and ARM64 devices.
+- Suitable for local servers, VPS, and ARM64 devices.
 
 ## Docker Image
 
-Docker Hub:
-
+**Docker Hub:**  
 https://hub.docker.com/r/idnetmyid/mikhmon3-ros7
 
 Pull the latest image:
@@ -30,16 +27,9 @@ Pull the latest image:
 docker pull idnetmyid/mikhmon3-ros7:latest
 ```
 
-## Requirements
-
-- Docker Engine
-- Docker Compose V2
-- Internet connection for pulling the Docker image
-- MikroTik RouterOS with API service enabled
-
 ## Installation
 
-### 1. Create Project Directory
+### 1. Create a Project Directory
 
 ```bash
 mkdir mikhmon
@@ -48,7 +38,7 @@ cd mikhmon
 
 ### 2. Create docker-compose.yml
 
-Create a file named `docker-compose.yml`:
+Create a file named `docker-compose.yml` with the following content:
 
 ```yaml
 services:
@@ -65,29 +55,34 @@ services:
     restart: unless-stopped
 ```
 
-### 3. Start Mikhmon
-
-Run:
+### 3. Start the Container
 
 ```bash
 docker compose up -d
 ```
 
-Docker will download the image and create the container.
-
 ### 4. Access Mikhmon
 
-Open your browser:
+Open the application in your browser:
 
 ```text
 http://SERVER-IP:83
 ```
 
-Replace `SERVER-IP` with your Docker host IP address.
+Replace `SERVER-IP` with the IP address of your Docker host.
+
+## Default Login Credentials
+
+Use the following credentials for the initial application login:
+
+| Field | Default Value |
+|---|---|
+| Username | `mikhmon` |
+| Password | `12345` |
 
 ## Directory Structure
 
-The deployment uses the following directory structure:
+The deployment uses persistent host directories:
 
 ```text
 mikhmon/
@@ -101,91 +96,78 @@ mikhmon/
     └── other application files
 ```
 
-### Volume Mapping
+### Volume Configuration
 
-| Host Directory | Container Path | Description |
+| Host Directory | Container Path | Purpose |
 |---|---|---|
 | `./data` | `/opt/mikhmon/data` | Persistent configuration |
 | `./web` | `/var/www/html` | Application web files |
 
-The container automatically initializes the application files when the web directory is empty.
+The container automatically initializes the application files when the `web` directory is empty.
 
-The default configuration file is automatically created at:
+The default configuration file is created automatically at:
 
 ```text
 data/config.php
 ```
 
-The application accesses this configuration through a symbolic link:
+The application accesses this persistent configuration through a symbolic link:
 
 ```text
 web/include/config.php
 ```
 
-This design keeps configuration data separate from application source files.
+This keeps configuration data separate from the application source files.
 
-## Configuration
-
-### Timezone
-
-The default timezone is:
-
-```yaml
-environment:
-  - TZ=Asia/Jakarta
-```
-
-This setting configures the container timezone to Western Indonesia Time (WIB).
-
-### MikroTik Router Connection
+## MikroTik Connection
 
 Configure your MikroTik router connection through the Mikhmon application.
 
-Make sure:
+Make sure that:
 
 - MikroTik API service is enabled.
-- The Docker container can reach the MikroTik router.
+- The router is reachable from the Docker container.
 - The API port is accessible through your network.
 - The configured MikroTik user has the required permissions.
 
 ## Supported Platforms
 
-The Docker image supports:
+This Docker image supports the following platforms:
 
-| Operating System | Architecture |
+| Platform | Architecture |
 |---|---|
 | Linux | AMD64 |
 | Linux | ARM64 |
 
-Docker automatically selects the appropriate image architecture for the host system.
+Docker automatically selects the appropriate image for the host architecture.
 
-## Docker Management Commands
+## Useful Docker Commands
 
-### Check Container Status
+Check container status:
 
 ```bash
 docker compose ps
 ```
 
-### View Logs
+View application logs:
 
 ```bash
 docker compose logs -f mikhmon
 ```
 
-### Restart Container
+Restart the application:
 
 ```bash
 docker compose restart mikhmon
 ```
 
-### Stop Container
+Stop the application:
 
 ```bash
 docker compose down
 ```
 
-### Update to Latest Image
+Update the image:
 
 ```bash
 docker compose pull
@@ -194,12 +176,9 @@ docker compose up -d
 
 ## Data Persistence and Backup
 
-The following directories are mounted from the host:
+The `data` and `web` directories are mounted from the host. This means configuration and application files remain available outside the container.
 
-- `data/` – stores persistent Mikhmon configuration.
-- `web/` – stores application files.
-
-For backup, save both directories.
+For backup, save both directories:
 
 ```text
 data/
@@ -208,38 +187,27 @@ web/
 
 Do not delete these directories when recreating the container if you want to retain your configuration and application files.
 
-## Security Recommendations
+## Security
 
+For a safer deployment:
+
+- Change the default Mikhmon login password after the first login, if password changes are supported by your application setup.
+- Avoid using default credentials on publicly accessible installations.
+- Restrict access to the Mikhmon web interface using a firewall or VPN.
 - Do not expose the MikroTik API directly to the public internet.
 - Use strong credentials for MikroTik API access.
-- Restrict access to the Mikhmon web interface.
-- Use a firewall or VPN for remote access.
-- Back up the `data/` directory regularly.
-- Never publish private configuration files or router credentials.
-
-## Development and Deployment
-
-This project uses Docker Buildx to build multi-platform images.
-
-Build and publish the latest image:
-
-```bash
-docker buildx build \
-  --platform linux/amd64,linux/arm64 \
-  -t idnetmyid/mikhmon3-ros7:latest \
-  --push .
-```
+- Do not publish your private `config.php` file.
+- Back up the `data` directory regularly.
 
 ## Disclaimer
 
 This project is an independent Docker packaging and customization developed from the original Mikhmon source code by **Laksa19**.
 
-Original Mikhmon project:
-
+**Original Mikhmon project:**  
 https://laksa19.github.io/
 
 All credit for the original Mikhmon application goes to its original developer, **Laksa19**.
 
-This project provides additional Docker packaging, configuration, and customizations to support modern deployment environments, including multi-platform architecture support.
+This project provides additional Docker packaging, configuration, and customizations to support modern deployment environments, including Docker-based installations and multi-platform architecture support.
 
 MikroTik and RouterOS are trademarks of MikroTik. This project is not an official MikroTik product and is not affiliated with or endorsed by MikroTik or the original Mikhmon developer.
