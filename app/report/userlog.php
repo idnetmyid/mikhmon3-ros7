@@ -27,33 +27,95 @@ if (!isset($_SESSION["mikhmon"])) {
 	$remdata = ($_POST['remdata']);
 
 
+
 	if (strlen($idhr) > "0") {
 		if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
-			$API->write('/system/script/print', false);
-			$API->write('?=source=' . $idhr . '');
-			$ARRAY = $API->read();
+
+			// Format idhr dari filter: MM/DD/YYYY.
+			// Format source MikroTik: YYYY-MM-DD.
+			$dateParts = explode("/", $idhr);
+			$dayPrefix = "";
+
+			if (
+				count($dateParts) == 3 &&
+				checkdate((int)$dateParts[0], (int)$dateParts[1], (int)$dateParts[2])
+			) {
+				$dayPrefix = $dateParts[2] . "-" .
+					str_pad($dateParts[0], 2, "0", STR_PAD_LEFT) . "-" .
+					str_pad($dateParts[1], 2, "0", STR_PAD_LEFT);
+			}
+
+			// Ambil catatan Mikhmon.
+			$allData = $API->comm("/system/script/print", array(
+				"?comment" => "mikhmon",
+			));
+
+			// Saring berdasarkan tanggal.
+			$ARRAY = array();
+
+			if ($dayPrefix != "" && is_array($allData)) {
+				foreach ($allData as $item) {
+					if (
+						isset($item['source']) &&
+						strpos($item['source'], $dayPrefix) === 0
+					) {
+						$ARRAY[] = $item;
+					}
+				}
+			}
+
 			$API->disconnect();
 		}
+
 		$filedownload = $idhr;
 		$shf = "hidden";
 		$shd = "text";
+
+
 	} elseif (strlen($idbl) > "0") {
 		if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
-			$API->write('/system/script/print', false);
-			$API->write('?=owner=' . $idbl . '');
-			$ARRAY = $API->read();
+
+			// Format idbl: MMYYYY, contoh 112026.
+			// Format source MikroTik: YYYY-MM-DD.
+			$monthPrefix = "";
+
+			if (preg_match('/^(0[1-9]|1[0-2])[0-9]{4}$/', $idbl)) {
+				$monthPrefix = substr($idbl, 2, 4) . "-" . substr($idbl, 0, 2);
+			}
+
+			// Ambil seluruh catatan Mikhmon.
+			$allData = $API->comm("/system/script/print", array(
+				"?comment" => "mikhmon",
+			));
+
+			// Saring berdasarkan tahun dan bulan pada source.
+			$ARRAY = array();
+
+			if ($monthPrefix != "" && is_array($allData)) {
+				foreach ($allData as $item) {
+					if (
+						isset($item['source']) &&
+						strpos($item['source'], $monthPrefix) === 0
+					) {
+						$ARRAY[] = $item;
+					}
+				}
+			}
+
 			$API->disconnect();
 		}
+
 		$filedownload = $idbl;
 		$shf = "hidden";
 		$shd = "text";
-	} elseif ($idhr == "" || $idbl == "") {
+	} elseif ($idhr == "" && $idbl == "") {
 		if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
-			$API->write('/system/script/print', false);
-			$API->write('?=comment=mikhmon');
-			$ARRAY = $API->read();
+			$ARRAY = $API->comm("/system/script/print", array(
+				"?comment" => "mikhmon",
+			));
 			$API->disconnect();
 		}
+
 		$filedownload = "all";
 		$shf = "text";
 		$shd = "hidden";
@@ -132,10 +194,10 @@ if (!isset($_SESSION["mikhmon"])) {
 			<div class="input-group-2 col-box-4">
 			<select style="padding:5px;" class="group-item group-item-md" title="Month" id="M">
         			<?php 
-										$idbls = array(1 => "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec");
+										$idbls = array(1 => "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
 										$idblf = array(1 => "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
 										$month = explode("/", $idhr)[0];
-										$month1 = substr($idbl, 0, 3);
+										$month1 = substr($idbl, 0, 2);
 
 										if ($month != "") {
 											$fm = array_search($month, $idbls);
@@ -156,7 +218,7 @@ if (!isset($_SESSION["mikhmon"])) {
 			<select style="padding:5px;" class="group-item group-item-md" title="Year" id="Y">
         			<?php 
 										$year = explode("/", $idhr)[2];
-										$year1 = substr($idbl, 3, 4);
+										$year1 = substr($idbl, 2, 4);
 
 										if ($year != "") {
 											echo "<option>" . $year . "</option>";

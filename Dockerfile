@@ -1,4 +1,3 @@
-
 FROM php:8.4.27-apache-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -9,12 +8,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /var/www/html
+# Store application source outside Apache document root
+WORKDIR /opt/mikhmon
+COPY app/ /opt/mikhmon/
 
-COPY app/ /var/www/html/
-
-RUN chown -R www-data:www-data /var/www/html
+# Install container entrypoint
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

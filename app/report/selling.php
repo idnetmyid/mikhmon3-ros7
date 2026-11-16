@@ -306,23 +306,27 @@ $(document).ready(function(){
 			<div class="input-group-2 col-box-3">
 			<select style="padding:5px;" class="group-item group-item-md" title="Year" id="Y">
         			<?php
-										$year = explode("-", $idhr)[0];
-										$year1 = substr($idbl, 2, 6);
+						$currentYear = (int) date("Y");
+						$startYear = $currentYear - 2;
 
-										if ($year != "") {
-											echo "<option>" . $year . "</option>";
-										} elseif ($year1 != "") {
-											echo "<option>" . $year1 . "</option>";
-										}
-											echo "<option>" . date("Y") . "</option>";
-										
-										for ($Y = 2018; $Y <= date("Y"); $Y++) {
-											if ($Y == date("Y")) {
-											} else {
-												echo "<option value='" . $Y . "'>" . $Y . "</option>";
-											}
-										}
-										?>
+						$year = explode("-", $idhr)[0];
+						$year1 = substr($idbl, 2, 4);
+
+						// Tampilkan hanya 3 tahun terakhir
+						for ($Y = $startYear; $Y <= $currentYear; $Y++) {
+							$selected = "";
+
+							if ($year != "" && (int) $year === $Y) {
+								$selected = " selected";
+							} elseif ($year == "" && $year1 != "" && (int) $year1 === $Y) {
+								$selected = " selected";
+							} elseif ($year == "" && $year1 == "" && $Y === $currentYear) {
+								$selected = " selected";
+							}
+
+							echo "<option value='" . $Y . "'" . $selected . ">" . $Y . "</option>";
+						}
+					?>
     		</select>
 			</div>
             <div class="input-group-2 col-box-3">

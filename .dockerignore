@@ -5,6 +5,9 @@
 backup/
 data/
 
+# Mikhmon private configuration
+app/include/config.php
+
 **/debug.log
 *.log
 *.tmp
