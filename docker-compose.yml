@@ -1,6 +1,6 @@
 services:
   mikhmon:
-    image: indrakur/mikhmon3-ros7:latest
+    image: idnetmyid/mikhmon3-ros7:latest
     container_name: mikhmon
     ports:
       - "83:80"
