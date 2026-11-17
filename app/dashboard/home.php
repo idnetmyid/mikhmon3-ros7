@@ -101,40 +101,79 @@ if (!isset($_SESSION["mikhmon"])) {
     } elseif ($countpppactive > 1) {
         $hunit = "items";
     }
-/*
-// get selling report
+
+    // get selling report - RouterOS 7
+    // Menggunakan mekanisme yang sama dengan selling.php dan userlog.php.
+
     $thisD = date("d");
-    $thisM = strtolower(date("M"));
+    $thisM = date("m");
     $thisY = date("Y");
 
-    if (strlen($thisD) == 1) {
-      $thisD = "0" . $thisD;
-    } else {
-      $thisD = $thisD;
-    }
+    $idhr = $thisY . "-" . $thisM . "-" . $thisD;
+    $monthPrefix = $thisY . "-" . $thisM;
 
-    $idhr = $thisM . "/" . $thisD . "/" . $thisY;
-    $idbl = $thisM . $thisY;
+    // Simpan tanggal laporan.
+    $_SESSION[$session.'idhr'] = $idhr;
 
-    $getSRHr = $API->comm("/system/script/print", array(
-      "?source" => "$idhr",
-    ));
-    $TotalRHr = count($getSRHr);
+    // Inisialisasi laporan.
+    $TotalRHr = 0;
+    $TotalRBl = 0;
+    $tHr = 0;
+    $tBl = 0;
+
+    // Ambil seluruh catatan penjualan Mikhmon.
     $getSRBl = $API->comm("/system/script/print", array(
-      "?owner" => "$idbl",
+      "?comment" => "mikhmon",
     ));
-    $TotalRBl = count($getSRBl);
 
-    for ($i = 0; $i < $TotalRHr; $i++) {
+    // Filter dan hitung penjualan.
+    if (is_array($getSRBl)) {
+      foreach ($getSRBl as $row) {
 
-      $tHr += explode("-|-", $getSRHr[$i]['name'])[3];
+        if (!isset($row['source']) || !isset($row['name'])) {
+          continue;
+        }
 
+        $source = $row['source'];
+
+        // Hanya menghitung penjualan bulan berjalan.
+        if (strpos($source, $monthPrefix) === 0) {
+
+          $TotalRBl++;
+
+          $getname = explode("-|-", $row['name']);
+
+          // Mengambil harga voucher.
+          $price = isset($getname[3]) ? (float)$getname[3] : 0;
+
+          // Total pendapatan bulan ini.
+          $tBl += $price;
+
+          // Menghitung penjualan hari ini.
+          if (strpos($source, $idhr) === 0) {
+
+            $TotalRHr++;
+            $tHr += $price;
+          }
+        }
+      }
     }
-    for ($i = 0; $i < $TotalRBl; $i++) {
 
-      $tBl += explode("-|-", $getSRBl[$i]['name'])[3];
+    // Format pendapatan sesuai mata uang.
+    if (in_array($currency, $cekindo['indo'])) {
+      $dincome = number_format((float)$tHr, 0, ",", ".");
+      $mincome = number_format((float)$tBl, 0, ",", ".");
+    } else {
+      $dincome = number_format((float)$tHr, 2);
+      $mincome = number_format((float)$tBl, 2);
     }
-  }*/
+
+    // Simpan hasil laporan ke session Dashboard.
+    $_SESSION[$session.'totalHr'] = $TotalRHr;
+    $_SESSION[$session.'totalBl'] = $TotalRBl;
+    $_SESSION[$session.'dincome'] = $dincome;
+    $_SESSION[$session.'mincome'] = $mincome;
+
 }
 ?>
     
