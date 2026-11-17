@@ -8,5 +8,4 @@ services:
       - TZ=Asia/Jakarta
     volumes:
       - ./data:/opt/mikhmon/data
-      - ./web:/var/www/html
     restart: unless-stopped

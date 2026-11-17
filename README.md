@@ -51,7 +51,6 @@ services:
       - TZ=Asia/Jakarta
     volumes:
       - ./data:/opt/mikhmon/data
-      - ./web:/var/www/html
     restart: unless-stopped
 ```
 
@@ -101,7 +100,6 @@ mikhmon/
 | Host Directory | Container Path | Purpose |
 |---|---|---|
 | `./data` | `/opt/mikhmon/data` | Persistent configuration |
-| `./web` | `/var/www/html` | Application web files |
 
 The container automatically initializes the application files when the `web` directory is empty.
 
