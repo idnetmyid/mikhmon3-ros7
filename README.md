@@ -88,11 +88,6 @@ mikhmon/
 ├── docker-compose.yml
 ├── data/
 │   └── config.php
-└── web/
-    ├── index.php
-    ├── include/
-    ├── report/
-    └── other application files
 ```
 
 ### Volume Configuration
@@ -109,11 +104,6 @@ The default configuration file is created automatically at:
 data/config.php
 ```
 
-The application accesses this persistent configuration through a symbolic link:
-
-```text
-web/include/config.php
-```
 
 This keeps configuration data separate from the application source files.
 
@@ -174,13 +164,12 @@ docker compose up -d
 
 ## Data Persistence and Backup
 
-The `data` and `web` directories are mounted from the host. This means configuration and application files remain available outside the container.
+The `data` directories are mounted from the host. This means configuration and application files remain available outside the container.
 
-For backup, save both directories:
+For backup, save directories:
 
 ```text
 data/
-web/
 ```
 
 Do not delete these directories when recreating the container if you want to retain your configuration and application files.
