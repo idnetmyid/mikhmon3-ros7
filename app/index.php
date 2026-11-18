@@ -464,7 +464,7 @@ elseif ($report == "export") {
   }
 
 // add ppp profile
-elseif ($ppp == "edit-profile") {
+elseif (substr($ppp, 0, 13) == "edit-profile=") {
   include_once('./ppp/profilebyname.php');
 }
 // remove enable disable profile
