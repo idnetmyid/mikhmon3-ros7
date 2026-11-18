@@ -86,8 +86,8 @@ The deployment uses persistent host directories:
 ```text
 mikhmon/
 ├── docker-compose.yml
-├── data/
-│   └── config.php
+└──  data/
+    └── config.php
 ```
 
 ### Volume Configuration
@@ -96,14 +96,11 @@ mikhmon/
 |---|---|---|
 | `./data` | `/opt/mikhmon/data` | Persistent configuration |
 
-The container automatically initializes the application files when the `web` directory is empty.
-
 The default configuration file is created automatically at:
 
 ```text
 data/config.php
 ```
-
 
 This keeps configuration data separate from the application source files.
 
