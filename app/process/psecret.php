@@ -12,9 +12,33 @@
 session_start();
 error_reporting(0);
 
-// Remove PPP Secret
+// Remove PPP Secret dan Scheduler terkait
 if ($removesecr != "") {
 
+    // Ambil data PPP Secret sebelum dihapus.
+    $getSecret = $API->comm("/ppp/secret/print", array(
+        "?.id" => $removesecr,
+    ));
+
+    if (isset($getSecret[0]['name'])) {
+
+        // Ambil nama PPP Secret.
+        $secretName = $getSecret[0]['name'];
+
+        // Cari Scheduler dengan nama yang sama.
+        $getScheduler = $API->comm("/system/scheduler/print", array(
+            "?name" => $secretName,
+        ));
+
+        // Hapus Scheduler jika ditemukan.
+        if (isset($getScheduler[0]['.id'])) {
+            $API->comm("/system/scheduler/remove", array(
+                ".id" => $getScheduler[0]['.id'],
+            ));
+        }
+    }
+
+    // Hapus PPP Secret.
     $API->comm("/ppp/secret/remove", array(
         ".id" => $removesecr,
     ));
