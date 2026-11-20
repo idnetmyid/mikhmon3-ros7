@@ -233,3 +233,16 @@ All credit for the original Mikhmon application goes to its original developer, 
 This project provides additional Docker packaging, configuration, and customizations to support modern deployment environments, including Docker-based installations and multi-platform architecture support.
 
 MikroTik and RouterOS are trademarks of MikroTik. This project is not an official MikroTik product and is not affiliated with or endorsed by MikroTik or the original Mikhmon developer.
+
+## Support
+
+If you find our projects useful, consider supporting their development and maintenance.
+
+Your support helps us continue improving our tools, services, and open-source projects.
+
+**Choose your preferred donation method:**
+
+- 🌍 [Donate via PayPal](https://paypal.me/idnetmyid)
+- 🇮🇩 [Donate via Saweria](https://saweria.co/idnet)
+
+Thank you for your support!
