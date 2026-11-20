@@ -152,7 +152,8 @@ if (!isset($_SESSION["mikhmon"])) {
   <script>
     function printV(a,b){
     var comm = document.getElementById('comment').value;
-    var url = "./voucher/print.php?id="+comm+"&"+a+"="+b+"&session=<?= $session; ?>";
+    var template = (a === 'qr' && b === 'yes') ? '&template=thermal' : '';
+    var url = "./voucher/print.php?id="+comm+"&"+a+"="+b+template+"&session=<?= $session; ?>";
     if (comm === "" ){
       <?php if ($currency == in_array($currency, $cekindo['indo'])) { ?>
       alert('Silakan pilih salah satu Comment terlebih dulu!');

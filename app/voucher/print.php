@@ -40,6 +40,7 @@ if (!isset($_SESSION["mikhmon"])) {
   $qr = $_GET['qr'];
   $small = $_GET['small'];
   $userp = $_GET['user'];
+  $template = $_GET['template'] ?? '';
 
   require('../lib/routeros_api.class.php');
   $API = new RouterosAPI();
@@ -191,7 +192,7 @@ table.voucher {
   $num = $i + 1;
   ?>
 <?php
-if ($userp != "") {
+if ($userp != "" || $template == "thermal") {
   include('./template-thermal.php');
 } else {
   if ($small == "yes") {
