@@ -62,5 +62,30 @@ session_start();
   </div>
 </div>
 
+<div style="text-align:center; margin:18px auto 25px; color:#adb5bd; font-size:13px;">
+  <div style="margin-bottom:10px;">
+    Support its development.
+  </div>
+
+  <a href="https://paypal.me/idnetmyid"
+     target="_blank"
+     rel="noopener noreferrer"
+     style="display:inline-block; margin:0 8px; color:#29a9df; text-decoration:none;">
+    🌍 Donate via PayPal
+  </a>
+
+  <a href="https://saweria.co/idnet"
+     target="_blank"
+     rel="noopener noreferrer"
+     style="display:inline-block; margin:0 8px; color:#ffc107; text-decoration:none;">
+    🇮🇩 Donate via Saweria
+  </a>
+
+  <div style="margin-top:9px; font-size:12px;">
+    Thank you for your support!
+  </div>
+</div>
+
+
 </body>
 </html>
