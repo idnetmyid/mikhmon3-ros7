@@ -2,7 +2,7 @@ services:
   mikhmon:
     image: idnetmyid/mikhmon3-ros7:latest
     container_name: mikhmon
-    network_mode: host
+    network_mode: bridge
     ports:
       - "83:80"
     environment:
