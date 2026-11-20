@@ -27,44 +27,86 @@ if (!isset($_SESSION["mikhmon"])) {
     date_default_timezone_set('Asia/Jakarta');
     $hariini = strtolower(date('M/d/Y H:i:s'));
 
+
     if (isset($_POST['name'])) {
-        $name = (preg_replace('/\s+/', '-', $_POST['name']));
-        $password = ($_POST['password']);
-        $service = ($_POST['service']);
-        $callerid = ($_POST['callerid']);
-        $profile = ($_POST['profile']);
-        $interval = ($_POST['interval']);
-        date_default_timezone_set('Asia/Jakarta');
-        $hari = date('d/M/Y');
-        $hariini = strtolower(date('M/d/Y H:i:s'));
+        $name = preg_replace('/\s+/', '-', trim($_POST['name']));
+        $password = $_POST['password'];
+        $service = $_POST['service'];
+        $callerid = $_POST['callerid'];
+        $profile = $_POST['profile'];
+        $interval = trim($_POST['interval']);
 
-        // $namesch = "PPP Secret Disabled " . $hariini;
-        $start_date = date('M/d/Y');
-        $start_time = date('H:i:s');
-        // $interval = "00:00:30";
-        // $on_event = "/ppp secret set disabled=yes [/ppp secret find name=" . $name . "] \r /system scheduler remove [find name=" . $name . "]";
-        $on_event = "/ppp secret set disabled=yes [/ppp secret find name=" . $name . "] \r /system scheduler disable [find name=" . $name . "]";
-
-        $API->comm("/ppp/secret/add", array(
-            /*"add-mac-cookie" => "yes",*/
-            "name" => "$name",
-            "password" => "$password",
-            "service" => "$service",
-            "caller-id" => "$callerid",
-            "profile" => "$profile",
+        // Buat PPP Secret dalam keadaan aktif.
+        $resultSecret = $API->comm("/ppp/secret/add", array(
+            "name" => $name,
+            "password" => $password,
+            "service" => $service,
+            "caller-id" => $callerid,
+            "profile" => $profile,
+            "disabled" => "no",
         ));
 
-        $API->comm("/system/scheduler/add", array(
-            /*"add-mac-cookie" => "yes",*/
-            "name" => "$name",
-            "start-date" => "$start_date",
-            "start-time" => "$start_time",
-            "interval" => "$interval",
-            "on-event" => "$on_event",
-        ));
+        // Scheduler hanya dibuat jika Interval diisi.
+        if ($interval !== "") {
 
-        echo "<script>window.location='./?ppp=secrets&session=" . $session . "'</script>";
+        // Validasi format durasi RouterOS.
+            if (!preg_match('/^(?:[0-9]+[wdhms])+$/', $interval)) {
+                echo "<script>alert('Format Interval tidak valid! Contoh: 30d, 5m, 12h');</script>";
+            } else {
+
+            // Konversi durasi menjadi detik.
+            preg_match_all('/([0-9]+)([wdhms])/', $interval, $matches, PREG_SET_ORDER);
+
+                $unitSeconds = array(
+                    'w' => 604800,
+                    'd' => 86400,
+                    'h' => 3600,
+                    'm' => 60,
+                    's' => 1
+                );
+
+                $durationSeconds = 0;
+
+                foreach ($matches as $match) {
+                    $durationSeconds += (int)$match[1] * $unitSeconds[$match[2]];
+                }
+
+                if ($durationSeconds <= 0) {
+                    echo "<script>alert('Interval harus lebih besar dari nol!');</script>";
+                } else {
+
+                // Hitung waktu kedaluwarsa dari waktu penyimpanan.
+                $timezone = new DateTimeZone('Asia/Jakarta');
+                $expiry = new DateTimeImmutable('now', $timezone);
+                $expiry = $expiry->modify('+' . $durationSeconds . ' seconds');
+
+                $start_date = strtolower($expiry->format('M/d/Y'));
+                $start_time = $expiry->format('H:i:s');
+
+                // Satu baris event: disable PPP Secret dan Scheduler.
+                $safeName = str_replace(
+                    array("\\", "\"", "$"),
+                    array("\\\\", "\\\"", "\\$"),
+                    $name
+                );
+
+                $on_event = '/ppp secret set disabled=yes [find where name="' . $safeName . '"]; ' .
+                    '/system scheduler disable [find where name="' . $safeName . '"]';
+
+                $API->comm("/system/scheduler/add", array(
+                    "name" => $name,
+                    "start-date" => $start_date,
+                    "start-time" => $start_time,
+                    "interval" => "0s",
+                    "on-event" => $on_event,
+                ));
+            }
+        }
     }
+
+    echo "<script>window.location='./?ppp=secrets&session=" . $session . "'</script>";
+    }
+
 }
 ?>
 <div class="row">
