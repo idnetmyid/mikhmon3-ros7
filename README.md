@@ -2,7 +2,7 @@
 
 **Mikhmon 3 for RouterOS 7** is a Docker-ready version of Mikhmon, designed to manage MikroTik Hotspot services through the MikroTik RouterOS API.
 
-This image uses PHP 8.4 with Apache and supports both **AMD64** and **ARM64** architectures, making it suitable for desktop servers, VPS, mini PCs, and ARM-based devices.
+This Docker image uses PHP 8.4 with Apache and supports both **AMD64** and **ARM64** architectures. It is suitable for desktop servers, VPS, mini PCs, and ARM-based devices.
 
 ## Features
 
@@ -10,11 +10,11 @@ This image uses PHP 8.4 with Apache and supports both **AMD64** and **ARM64** ar
 - Designed for MikroTik RouterOS 7.
 - Supports MikroTik Hotspot management and PPPoE Client.
 - Multi-platform image: `linux/amd64` and `linux/arm64`.
-- Persistent configuration and application data.
+- Docker Bridge networking.
+- Persistent application configuration.
 - Automatic initial configuration file creation.
 - Docker Compose support.
-- Application source files can be managed through a host directory.
-- Suitable for local servers, VPS, and ARM64 devices.
+- Suitable for local servers, VPS, mini PCs, and ARM64 devices.
 
 ## Docker Image
 
@@ -45,6 +45,7 @@ services:
   mikhmon:
     image: idnetmyid/mikhmon3-ros7:latest
     container_name: mikhmon
+    network_mode: bridge
     ports:
       - "83:80"
     environment:
@@ -62,13 +63,43 @@ docker compose up -d
 
 ### 4. Access Mikhmon
 
-Open the application in your browser:
+Open Mikhmon in your browser:
 
 ```text
 http://SERVER-IP:83
 ```
 
 Replace `SERVER-IP` with the IP address of your Docker host.
+
+## Network Configuration
+
+This deployment uses Docker **Bridge Network**.
+
+The port mapping:
+
+```yaml
+ports:
+  - "83:80"
+```
+
+means:
+
+| Component | Port |
+|---|---:|
+| Docker host | 83 |
+| Mikhmon container (Apache) | 80 |
+
+Access Mikhmon through the Docker host IP and port 83.
+
+Bridge networking provides network isolation between the container and the host while allowing outbound connections to MikroTik routers, provided the network and firewall permit them.
+
+Make sure that:
+
+- The Docker host can reach the MikroTik router.
+- The MikroTik API service is enabled.
+- The configured API port is accessible.
+- The MikroTik user has the required permissions.
+- Firewall rules allow communication between the Docker host and MikroTik.
 
 ## Default Login Credentials
 
@@ -79,14 +110,16 @@ Use the following credentials for the initial application login:
 | Username | `mikhmon` |
 | Password | `12345` |
 
+Change the default password after your first login.
+
 ## Directory Structure
 
-The deployment uses persistent host directories:
+The deployment uses a persistent host directory for application configuration:
 
 ```text
 mikhmon/
 ├── docker-compose.yml
-└──  data/
+└── data/
     └── config.php
 ```
 
@@ -94,94 +127,99 @@ mikhmon/
 
 | Host Directory | Container Path | Purpose |
 |---|---|---|
-| `./data` | `/opt/mikhmon/data` | Persistent configuration |
+| `./data` | `/opt/mikhmon/data` | Persistent application configuration |
 
-The default configuration file is created automatically at:
+The configuration file is automatically created during the first container initialization:
 
 ```text
 data/config.php
 ```
 
-This keeps configuration data separate from the application source files.
-
-## MikroTik Connection
-
-Configure your MikroTik router connection through the Mikhmon application.
-
-Make sure that:
-
-- MikroTik API service is enabled.
-- The router is reachable from the Docker container.
-- The API port is accessible through your network.
-- The configured MikroTik user has the required permissions.
+The configuration is stored outside the Apache document root and remains available when the container is recreated or updated.
 
 ## Supported Platforms
 
-This Docker image supports the following platforms:
+This Docker image supports:
 
 | Platform | Architecture |
 |---|---|
 | Linux | AMD64 |
 | Linux | ARM64 |
 
-Docker automatically selects the appropriate image for the host architecture.
+Docker automatically selects the appropriate image architecture for the host system.
 
 ## Useful Docker Commands
 
-Check container status:
+### Check Container Status
 
 ```bash
 docker compose ps
 ```
 
-View application logs:
+### View Application Logs
 
 ```bash
 docker compose logs -f mikhmon
 ```
 
-Restart the application:
+### Restart the Container
 
 ```bash
 docker compose restart mikhmon
 ```
 
-Stop the application:
+### Stop and Remove the Container
 
 ```bash
 docker compose down
 ```
 
-Update the image:
+The persistent `data` directory is not removed by this command.
+
+### Update the Docker Image
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
+### Check Container Network
+
+```bash
+docker inspect mikhmon
+```
+
 ## Data Persistence and Backup
 
-The `data` directories are mounted from the host. This means configuration and application files remain available outside the container.
+The `data` directory is mounted from the host and stores the persistent application configuration.
 
-For backup, save directories:
+Back up this directory regularly:
 
 ```text
 data/
 ```
 
-Do not delete these directories when recreating the container if you want to retain your configuration and application files.
+Example backup command:
+
+```bash
+tar -czf mikhmon-data-backup.tar.gz data/
+```
+
+To restore the configuration, stop the container and restore the backed-up `data` directory before starting the container again.
+
+**Important:** Do not delete the `data` directory when updating or recreating the container if you want to retain your application configuration.
 
 ## Security
 
 For a safer deployment:
 
-- Change the default Mikhmon login password after the first login, if password changes are supported by your application setup.
-- Avoid using default credentials on publicly accessible installations.
+- Change the default Mikhmon login password after the first login.
 - Restrict access to the Mikhmon web interface using a firewall or VPN.
 - Do not expose the MikroTik API directly to the public internet.
 - Use strong credentials for MikroTik API access.
 - Do not publish your private `config.php` file.
 - Back up the `data` directory regularly.
+- Keep the Docker image and host operating system updated.
 
 ## Disclaimer
 
