@@ -1,0 +1,97 @@
+name: Build Release ZIPs
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-zips:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout release source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          path: source
+
+      - name: Checkout Desktop runtime
+        uses: actions/checkout@v4
+        with:
+          ref: desktop-runtime
+          path: runtime
+
+      - name: Prepare ZIP files
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.release.tag_name }}"
+
+          $sourceStage = "build/source"
+          $desktopStage = "build/desktop"
+
+          New-Item -ItemType Directory -Force $sourceStage | Out-Null
+          New-Item -ItemType Directory -Force $desktopStage | Out-Null
+          # Validate required directories and files
+          $requiredPaths = @(
+            "source/app",
+            "runtime/php",
+            "runtime/idnet.exe"
+          )
+
+          foreach ($path in $requiredPaths) {
+            if (!(Test-Path $path)) {
+              throw "Komponen wajib tidak ditemukan: $path"
+            }
+          }
+
+          # Source ZIP
+          Copy-Item "source/app" $sourceStage -Recurse
+
+          $sourceFiles = @(
+            ".dockerignore",
+            ".gitignore",
+            "Dockerfile",
+            "README.md",
+            "docker-compose.yml",
+            "entrypoint.sh"
+          )
+
+          foreach ($file in $sourceFiles) {
+            if (!(Test-Path "source/$file")) {
+              throw "File tidak ditemukan: $file"
+            }
+            Copy-Item "source/$file" $sourceStage
+          }
+
+          # Desktop ZIP
+          Copy-Item "source/app" $desktopStage -Recurse
+          Copy-Item "runtime/php" $desktopStage -Recurse
+          Copy-Item "runtime/idnet.exe" $desktopStage
+
+          # Create ZIP, including hidden files
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+          [System.IO.Compression.ZipFile]::CreateFromDirectory(
+            (Resolve-Path $sourceStage).Path,
+            "mikhmon3-ros7-$tag-source.zip"
+          )
+
+          [System.IO.Compression.ZipFile]::CreateFromDirectory(
+            (Resolve-Path $desktopStage).Path,
+            "mikhmon3-ros7-$tag-desktop.zip"
+          )
+
+      - name: Upload ZIPs to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.release.tag_name }}"
+
+          gh release upload $tag `
+            "mikhmon3-ros7-$tag-source.zip" `
+            "mikhmon3-ros7-$tag-desktop.zip" `
+            --clobber
