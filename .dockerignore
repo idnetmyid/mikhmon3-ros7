@@ -14,3 +14,17 @@ app/include/config.php
 
 .env
 .env.*
+
+# Windows binaries, PHP Windows runtime, & C# build artifacts
+php/
+*.exe
+*.dll
+*.pdb
+*.cs
+*.csproj
+*.user
+bin/
+obj/
+app.ico
+logo.png
+logo_raw.jpg

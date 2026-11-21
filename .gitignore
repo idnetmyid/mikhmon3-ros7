@@ -21,3 +21,14 @@ desktop.ini
 
 # Editor
 .vscode/
+
+# C# Build Artifacts & Source Mentah (Hanya menyisakan idnet.exe)
+/bin/
+/obj/
+*.cs
+*.csproj
+*.user
+*.pdb
+app.ico
+logo.png
+logo_raw.jpg
