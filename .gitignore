@@ -18,6 +18,8 @@ app/include/config.php
 .DS_Store
 Thumbs.db
 desktop.ini
+/php/
+/idnet.exe
 
 # Editor
 .vscode/
