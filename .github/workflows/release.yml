@@ -94,5 +94,5 @@ jobs:
           gh release upload $tag `
             "mikhmon3-ros7-$tag-source.zip" `
             "mikhmon3-ros7-$tag-desktop.zip" `
-            --repo idnetmyid/mikhmon3-ros7
+            --repo idnetmyid/mikhmon3-ros7 `
             --clobber
