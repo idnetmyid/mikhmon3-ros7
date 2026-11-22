@@ -21,7 +21,7 @@ jobs:
       - name: Checkout Desktop runtime
         uses: actions/checkout@v4
         with:
-          ref: desktop-runtime
+          ref: desktop
           path: runtime
 
       - name: Prepare ZIP files
