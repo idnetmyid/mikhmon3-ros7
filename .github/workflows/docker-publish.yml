@@ -1,4 +1,4 @@
-name: Build and Publish Mikhmon Docker
+name: Build and Publish Docker
 
 on:
   release:
