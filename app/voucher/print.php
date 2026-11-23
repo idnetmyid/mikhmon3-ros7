@@ -102,7 +102,7 @@ if (!isset($_SESSION["mikhmon"])) {
   if (file_exists($logo)) {
     $logo = "../img/logo-" . $session . ".png?t=". str_replace(" ","_",date("Y-m-d H:i:s"));
   } else {
-    $logo = "../img/logo.png?t=". str_replace(" ","_",date("Y-m-d H:i:s"));
+    $logo = "../img/voucher.png?t=". str_replace(" ","_",date("Y-m-d H:i:s"));
   }
 
 }
@@ -113,7 +113,7 @@ if (!isset($_SESSION["mikhmon"])) {
 		<title>Voucher-<?= $hotspotname . "-" . $getuprofile . "-" . $id; ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta http-equiv="pragma" content="no-cache" />
-		<link rel="icon" href="../img/favicon.png" />
+		<link rel="icon" href="../img/favicon.ico" />
 		<script src="../js/qrious.min.js"></script>
 		<style>
 body {

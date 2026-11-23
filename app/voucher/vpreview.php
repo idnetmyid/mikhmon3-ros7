@@ -45,7 +45,7 @@ if (!isset($_SESSION["mikhmon"])) {
   if (file_exists($logo)) {
     $logo = "../img/logo-" . $session . ".png";
   } else {
-    $logo = "../img/logo.png";
+    $logo = "../img/voucher.png";
   }
 
  
@@ -98,7 +98,7 @@ if ($currency == in_array($currency, $cekindo['indo'])) {
 		<title>Voucher-<?= $hotspotname . "-" . $getuprofile . "-" . $id; ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta http-equiv="pragma" content="no-cache" />
-    <link rel="icon" href="../img/favicon.png" />
+    <link rel="icon" href="../img/favicon.ico" />
     <script src="../js/qrious.min.js"></script>
 		<style>
 body {
