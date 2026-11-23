@@ -1,3 +1,4 @@
+
 FROM php:8.4.27-apache-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -8,9 +9,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Store application source outside Apache document root
-WORKDIR /opt/mikhmon
-COPY app/ /opt/mikhmon/
+# Apache document root sekaligus lokasi source Mikhmon
+WORKDIR /var/www/html
+
+# Copy source aplikasi langsung ke Apache document root
+COPY app/ /var/www/html/
 
 # Install container entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
