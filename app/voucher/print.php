@@ -174,20 +174,32 @@ table.voucher {
     $datalimit = formatBytes($getdatalimit, 2);
   }
   
+  
   $urilogin = "http://$dnsname/login?username=$username&password=$password";
+
+  // QR voucher: cukup username.
+  // QR member (username/password berbeda): tetap gunakan URL lama.
+  $qrValue = ($usermode == "vc") ? $username : $urilogin;
+
+  // Aman untuk dimasukkan ke JavaScript.
+  $qrValueJs = json_encode(
+    $qrValue,
+    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+  );
+
   $qrcode = "
-	<canvas class='qrcode' id='".$uid."'></canvas>
+    <canvas class='qrcode' id='".$uid."'></canvas>
     <script>
       (function() {
         var ".$uid." = new QRious({
           element: document.getElementById('".$uid."'),
-          value: '".$urilogin."',
-          size:'256'
+          value: ".$qrValueJs.",
+          size: 256
         });
-
       })();
     </script>
-	";
+  ";
+
  
   $num = $i + 1;
   ?>

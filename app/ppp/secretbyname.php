@@ -196,9 +196,15 @@ if (!isset($_SESSION["mikhmon"])) {
             array("\\\\", "\\\"", "\\$"),
             $name
         );
-
+        
+        // Event kedaluwarsa:
+        // 1. Nonaktifkan PPP Secret.
+        // 2. Putuskan koneksi PPPoE aktif.
+        // 3. Nonaktifkan Scheduler.
         $on_event = '/ppp secret set disabled=yes [find where name="' . $safeName . '"]; ' .
+            '/ppp active remove [find where name="' . $safeName . '"]; ' .
             '/system scheduler disable [find where name="' . $safeName . '"]';
+
 
         /*
          * Jika Interval kosong:
